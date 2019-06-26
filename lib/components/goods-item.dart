@@ -20,6 +20,8 @@ class GoodsItem extends StatefulWidget {
 }
 
 class _GoodsItemState extends State<GoodsItem> {
+  int quantity = 0;
+
   Map get data {
     final bool choose = widget.item['units'].length > 1;
     final Map newer = {'title': widget.item['name'], 'choose': choose};
@@ -52,6 +54,12 @@ class _GoodsItemState extends State<GoodsItem> {
 
   String get price {
     return forceMoney(this.data['price']);
+  }
+
+  void changeHandler(int newer, int old) {
+    setState(() {
+      this.quantity = newer;
+    });
   }
 
   @override
@@ -104,7 +112,7 @@ class _GoodsItemState extends State<GoodsItem> {
                                       fontSize: 12, color: Colors.red[300]))
                             ],
                           ),
-                          NumberInput()
+                          NumberInput(value: this.quantity, min: 0, onChange: this.changeHandler,)
                         ],
                       )
               ],

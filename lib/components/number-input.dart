@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:core';
 
 class NumberInput extends StatefulWidget {
   final int min;
   final int max;
   final int step;
   final int value;
-  final VoidCallback onChange;
+  final Function(int newer, int old) onChange;
 
   const NumberInput(
       {Key key,
@@ -23,8 +24,31 @@ class NumberInput extends StatefulWidget {
 }
 
 class _NumberInputState extends State<NumberInput> {
+  TextEditingController controller = TextEditingController();
+
+  stepBy(int step) {
+    int value = this.widget.value;
+    this.change(value + step);
+  }
+
+  change(int newer) {
+    int value = newer ?? 0;
+    if (value >= this.widget.min &&
+        value <= this.widget.max &&
+        this.widget.onChange != null) {
+      this.widget.onChange(value, this.widget.value);
+    }
+  }
+
+  get compare {
+    return this.widget.value <= this.widget.min
+        ? -1
+        : this.widget.value >= this.widget.max ? 1 : 0;
+  }
+
   @override
   Widget build(BuildContext context) {
+    controller.text = widget.value.toString();
     return Container(
       height: 30,
       margin: EdgeInsets.only(right: 5),
@@ -35,26 +59,39 @@ class _NumberInputState extends State<NumberInput> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           InkResponse(
-            onTap: () {},
+            onTap: this.compare == -1
+                ? null
+                : () => this.stepBy(-this.widget.step),
             child: Padding(
               padding: EdgeInsets.only(left: 8),
-              child: Icon(Icons.remove, size: 16),
+              child: Icon(
+                Icons.remove,
+                size: 16,
+                color: this.compare == -1 ? Colors.grey : Colors.black,
+              ),
             ),
           ),
           VerticalDivider(),
           Container(
             width: 26,
             child: TextField(
+              controller: controller,
+              textAlign: TextAlign.center,
               decoration: InputDecoration(
                   border: InputBorder.none, contentPadding: EdgeInsets.zero),
             ),
           ),
           VerticalDivider(),
           InkResponse(
-            onTap: () {},
+            onTap:
+                this.compare == 1 ? null : () => this.stepBy(this.widget.step),
             child: Padding(
               padding: EdgeInsets.only(right: 8),
-              child: Icon(Icons.add, size: 16),
+              child: Icon(
+                Icons.add,
+                size: 16,
+                color: this.compare == 1 ? Colors.grey : Colors.black,
+              ),
             ),
           ),
         ],

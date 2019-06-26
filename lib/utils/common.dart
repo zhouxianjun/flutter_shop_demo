@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' show min;
 
 /**
  * vo中的字符串分隔值转为集合
