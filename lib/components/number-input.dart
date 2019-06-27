@@ -77,6 +77,7 @@ class _NumberInputState extends State<NumberInput> {
             child: TextField(
               controller: controller,
               textAlign: TextAlign.center,
+              onChanged: (val) => this.change(int.parse(val)),
               decoration: InputDecoration(
                   border: InputBorder.none, contentPadding: EdgeInsets.zero),
             ),

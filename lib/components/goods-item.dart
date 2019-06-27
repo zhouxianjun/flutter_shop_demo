@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_shop_demo/config.dart';
 import 'package:flutter_shop_demo/components/number-input.dart';
+import 'package:flutter_shop_demo/store/cart-goods.dart';
+import 'package:flutter_shop_demo/store/shopping-cart.dart';
 import 'package:flutter_shop_demo/utils/common.dart' show forceMoney;
+import 'package:provider/provider.dart';
 
 class GoodsItem extends StatefulWidget {
   final dynamic item;
@@ -15,51 +19,57 @@ class GoodsItem extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _GoodsItemState();
+    CartGoods data = CartGoods(
+        title: item['name'],
+        choose: item['units'].length > 1,
+        name: item['units'][0]['name'],
+        price: item['units'][0]['price'],
+        picture: item['units'][0]['picture'],
+        id: item['units'][0]['id'],
+        quantity: 0,
+        goodsId: item['units'][0]['goodsId'],
+        canSaleQty: 10,
+        categoryId: item['units'][0]['categoryId']);
+    return _GoodsItemState(data);
   }
 }
 
 class _GoodsItemState extends State<GoodsItem> {
-  int quantity = 0;
+  final CartGoods data;
+  ShoppingCart shoppingCart;
 
-  Map get data {
-    final bool choose = widget.item['units'].length > 1;
-    final Map newer = {'title': widget.item['name'], 'choose': choose};
-    newer.addAll(widget.item['units'][0]);
-    if (!choose) {
-      // const cart = this.shoppingCart.find(v => v.id === item.units[0].id);
-      // if (cart) {
-      //     newer.quantity = cart.quantity;
-      // }
-    }
-    return newer;
+  _GoodsItemState(this.data);
+
+  @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
+    shoppingCart = Provider.of<ShoppingCart>(context);
   }
 
   String get picture {
-    final String url = this.data['picture'];
+    final String url = this.data.picture;
     return '${Config.IMG_ADDRESS}$url';
   }
 
   String get title {
-    return this.data['title'];
+    return this.data.title;
   }
 
   String get name {
-    return this.data['name'];
+    return this.data.name;
   }
 
   bool get choose {
-    return this.data['choose'];
+    return this.data.choose;
   }
 
   String get price {
-    return forceMoney(this.data['price']);
+    return forceMoney(this.data.price);
   }
 
   void changeHandler(int newer, int old) {
-    setState(() {
-      this.quantity = newer;
-    });
+    shoppingCart.putIfAbsent(this.data);
+    this.data.changeQuantity(newer);
   }
 
   @override
@@ -76,8 +86,10 @@ class _GoodsItemState extends State<GoodsItem> {
               children: <Widget>[
                 Align(
                     alignment: Alignment.topLeft,
-                    child: Text(this.title,
-                        style: TextStyle(fontSize: 14, color: Colors.black))),
+                    child: Observer(
+                      builder: (_) => Text(this.title,
+                          style: TextStyle(fontSize: 14, color: Colors.black)),
+                    )),
                 this.choose
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -112,7 +124,13 @@ class _GoodsItemState extends State<GoodsItem> {
                                       fontSize: 12, color: Colors.red[300]))
                             ],
                           ),
-                          NumberInput(value: this.quantity, min: 0, onChange: this.changeHandler,)
+                          Observer(
+                            builder: (_) => NumberInput(
+                                  value: this.data.quantity,
+                                  min: 0,
+                                  onChange: this.changeHandler,
+                                ),
+                          )
                         ],
                       )
               ],

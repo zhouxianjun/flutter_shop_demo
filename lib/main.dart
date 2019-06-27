@@ -3,11 +3,13 @@ import 'package:fluro/fluro.dart';
 import 'package:provider/provider.dart';
 import 'views/home/index.dart';
 import 'store/counter.dart';
+import 'package:flutter_shop_demo/store/shopping-cart.dart';
 import './routers.dart';
 
 void main() => runApp(MultiProvider(
   providers: [
-    Provider<Counter>(builder: (_) => Counter())
+    Provider<Counter>(builder: (_) => Counter()),
+    Provider<ShoppingCart>(builder: (_) => ShoppingCart(),)
   ],
   child: MyApp(),
 ));
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
         buttonTheme: ButtonThemeData(
           minWidth: 0,
           height: 0,
-          padding: EdgeInsets.all(0),
+          padding: EdgeInsets.zero,
           buttonColor: Colors.transparent
         )
       ),
