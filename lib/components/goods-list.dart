@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_shop_demo/utils/http.dart';
 import 'package:flutter_shop_demo/utils/common.dart' show collectionForVo;
 import 'package:flutter_shop_demo/components/goods-item.dart';
@@ -36,9 +37,7 @@ class _GoodsListState extends State<GoodsList> {
     super.dispose();
   }
 
-  chooseHandler() {
-
-  }
+  chooseHandler() {}
 
   refresh() {
     return this.pull(force: true);
@@ -87,14 +86,19 @@ class _GoodsListState extends State<GoodsList> {
   @override
   Widget build(BuildContext context) {
     categoryWatch.value = widget.category;
-    return ListView.separated(
-      itemCount: this.list.length,
-      separatorBuilder: (_, i) {
-        return Divider();
+    return EasyRefresh(
+      onRefresh: () {
+        return this.refresh();
       },
-      itemBuilder: (_, i) {
-        return GoodsItem(this.list[i], onChoose: this.chooseHandler);
-      },
+      child: ListView.separated(
+        itemCount: this.list.length,
+        separatorBuilder: (_, i) {
+          return Divider();
+        },
+        itemBuilder: (_, i) {
+          return GoodsItem(this.list[i], onChoose: this.chooseHandler);
+        },
+      ),
     );
   }
 }

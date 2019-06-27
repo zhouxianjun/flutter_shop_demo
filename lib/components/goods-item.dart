@@ -86,10 +86,8 @@ class _GoodsItemState extends State<GoodsItem> {
               children: <Widget>[
                 Align(
                     alignment: Alignment.topLeft,
-                    child: Observer(
-                      builder: (_) => Text(this.title,
-                          style: TextStyle(fontSize: 14, color: Colors.black)),
-                    )),
+                    child: Text(this.title,
+                        style: TextStyle(fontSize: 14, color: Colors.black))),
                 this.choose
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
