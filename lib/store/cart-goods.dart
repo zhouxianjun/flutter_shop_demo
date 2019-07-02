@@ -1,10 +1,12 @@
 import 'package:mobx/mobx.dart';
+import 'package:flutter_shop_demo/store/shopping-cart.dart';
 
 part 'cart-goods.g.dart';
 
 class CartGoods = _CartGoods with _$CartGoods;
 
 abstract class _CartGoods with Store {
+  final ShoppingCart shoppingCart;
   /**
    * 商品名称
    */
@@ -47,13 +49,34 @@ abstract class _CartGoods with Store {
    */
   int categoryId;
 
-  _CartGoods({
+  _CartGoods(
+    this.shoppingCart,
+    {
     this.title, this.choose, 
     this.name, this.price, 
     this.picture, this.id, 
     this.quantity, this.goodsId,
     this.canSaleQty, this.categoryId
   });
+
+  /**
+   * 获取当前规格最大数量
+   * 当前规格加入数量 + 可售 - 相同商品的所有已加入数量
+   */
+  @computed
+  int get max {
+    print('$goodsId -- $have');
+    return this.quantity + this.canSaleQty - this.have;
+  }
+
+  @computed
+  int get have {
+    ObservableList list = ObservableList.of(this.shoppingCart.data.where((item) => item.goodsId == this.goodsId));
+    if (list.isEmpty) {
+      return 0;
+    }
+    return list.map((item) => item.quantity).reduce((total, current) => total + current);
+  }
 
   @action
   void changeQuantity(int quantity) {

@@ -19,31 +19,29 @@ class GoodsItem extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    CartGoods data = CartGoods(
-        title: item['name'],
-        choose: item['units'].length > 1,
-        name: item['units'][0]['name'],
-        price: item['units'][0]['price'],
-        picture: item['units'][0]['picture'],
-        id: item['units'][0]['id'],
-        quantity: 0,
-        goodsId: item['units'][0]['goodsId'],
-        canSaleQty: 10,
-        categoryId: item['units'][0]['categoryId']);
-    return _GoodsItemState(data);
+    return _GoodsItemState();
   }
 }
 
 class _GoodsItemState extends State<GoodsItem> {
-  final CartGoods data;
+  CartGoods data;
   ShoppingCart shoppingCart;
-
-  _GoodsItemState(this.data);
 
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
     shoppingCart = Provider.of<ShoppingCart>(context);
+    data = CartGoods(shoppingCart,
+        title: widget.item['name'],
+        choose: widget.item['units'].length > 1,
+        name: widget.item['units'][0]['name'],
+        price: widget.item['units'][0]['price'],
+        picture: widget.item['units'][0]['picture'],
+        id: widget.item['units'][0]['id'],
+        quantity: 0,
+        goodsId: widget.item['units'][0]['goodsId'],
+        canSaleQty: 10,
+        categoryId: widget.item['units'][0]['categoryId']);
   }
 
   String get picture {
@@ -126,6 +124,7 @@ class _GoodsItemState extends State<GoodsItem> {
                             builder: (_) => NumberInput(
                                   value: this.data.quantity,
                                   min: 0,
+                                  max: this.data.max,
                                   onChange: this.changeHandler,
                                 ),
                           )
