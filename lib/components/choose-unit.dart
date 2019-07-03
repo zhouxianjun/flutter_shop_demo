@@ -62,13 +62,20 @@ class _ChooseUnitState extends State<ChooseUnit> {
                 max: this.unit.max,
                 onChange: this.changeHandler,
               )
-            : FlatButton.icon(
-                icon: Icon(Icons.add),
-                label: Text('加入购物车'),
+            : FlatButton(
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.add),
+                    Text(
+                      '加入购物车',
+                      style: TextStyle(fontSize: 12),
+                    )
+                  ],
+                ),
                 color: Color(0xFFFF4081),
                 textColor: Colors.white,
                 shape: StadiumBorder(),
-                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                padding: EdgeInsets.symmetric(vertical: 3, horizontal: 8),
                 onPressed: () {
                   this.changeHandler(1, 0);
                 },

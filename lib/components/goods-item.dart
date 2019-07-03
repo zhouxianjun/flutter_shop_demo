@@ -63,10 +63,41 @@ class _GoodsItemState extends State<GoodsItem> {
 
   void chooseHandler() {
     showDialog(
-      context: context,
-      builder: (BuildContext _) {
-        return ChooseUnit(this.data);
-      }
+        context: context,
+        builder: (BuildContext _) {
+          return ChooseUnit(this.data);
+        });
+  }
+
+  Widget get renderAdd {
+    return Observer(
+      builder: (_) {
+        return this.data.quantity > 0
+            ? NumberInput(
+                value: this.data.quantity,
+                min: 0,
+                max: this.data.max,
+                onChange: this.changeHandler,
+              )
+            : FlatButton(
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.add),
+                    Text(
+                      '加入购物车',
+                      style: TextStyle(fontSize: 12),
+                    )
+                  ],
+                ),
+                color: Color(0xFFFF4081),
+                textColor: Colors.white,
+                shape: StadiumBorder(),
+                padding: EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                onPressed: () {
+                  this.changeHandler(1, 0);
+                },
+              );
+      },
     );
   }
 
@@ -120,14 +151,7 @@ class _GoodsItemState extends State<GoodsItem> {
                                       fontSize: 12, color: Colors.red[300]))
                             ],
                           ),
-                          Observer(
-                            builder: (_) => NumberInput(
-                                  value: this.data.quantity,
-                                  min: 0,
-                                  max: this.data.max,
-                                  onChange: this.changeHandler,
-                                ),
-                          )
+                          this.renderAdd
                         ],
                       )
               ],
