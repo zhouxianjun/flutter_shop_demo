@@ -32,6 +32,9 @@ class _HomeState extends State<Home> {
     if (success) {
       setState(() {
         this.categorys = res.data['value'];
+        if (this.categorys != null && this.categorys.length > 0) {
+          this.selected = this.categorys[0]['id'];
+        }
       });
     }
   }
