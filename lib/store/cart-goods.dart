@@ -48,16 +48,41 @@ abstract class _CartGoods with Store {
    * 类别ID
    */
   int categoryId;
+  List units;
 
-  _CartGoods(
-    this.shoppingCart,
-    {
-    this.title, this.choose, 
-    this.name, this.price, 
-    this.picture, this.id, 
-    this.quantity, this.goodsId,
-    this.canSaleQty, this.categoryId
-  });
+  _CartGoods(this.shoppingCart,
+      {this.title,
+      this.choose,
+      this.name,
+      this.price,
+      this.picture,
+      this.id,
+      this.quantity,
+      this.goodsId,
+      this.canSaleQty,
+      this.categoryId,
+      this.units});
+
+  _CartGoods.fromJSON(this.shoppingCart, Map map) {
+    Map unit;
+    if (map.containsKey('units')) {
+      unit = map['units'][0];
+      units = map['units'];
+    } else {
+      unit = map;
+      units = [];
+    }
+    title = map['name'];
+    choose = units.length > 1;
+    name = unit['name'];
+    price = unit['price'];
+    picture = unit['picture'];
+    id = unit['id'];
+    quantity = 0;
+    goodsId = unit['goodsId'];
+    canSaleQty = unit['canSaleQty'];
+    categoryId = unit['categoryId'];
+  }
 
   /**
    * 获取当前规格最大数量
@@ -71,11 +96,14 @@ abstract class _CartGoods with Store {
 
   @computed
   int get have {
-    ObservableList list = ObservableList.of(this.shoppingCart.data.where((item) => item.goodsId == this.goodsId));
+    ObservableList list = ObservableList.of(
+        this.shoppingCart.data.where((item) => item.goodsId == this.goodsId));
     if (list.isEmpty) {
       return 0;
     }
-    return list.map((item) => item.quantity).reduce((total, current) => total + current);
+    return list
+        .map((item) => item.quantity)
+        .reduce((total, current) => total + current);
   }
 
   @action

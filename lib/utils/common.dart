@@ -17,7 +17,7 @@ void collectionForVo(vo, String prefix, [name]) {
       map[newerKey] = val;
       minLength = minLength == 0 ? val.length : min(minLength, val.length);
     });
-    vo[name ?? '${prefix}s'] = List.generate(minLength, (index) {
+    vo[name ?? '${prefix}s'] = List<Map<String, dynamic>>.generate(minLength, (index) {
       Map<String, dynamic> obj = {};
       map.forEach((key, val) => obj[key] = val[index]);
       return obj;

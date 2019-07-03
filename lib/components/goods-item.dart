@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_shop_demo/components/choose-unit.dart';
 import 'package:flutter_shop_demo/config.dart';
 import 'package:flutter_shop_demo/components/number-input.dart';
 import 'package:flutter_shop_demo/store/cart-goods.dart';
@@ -31,17 +32,7 @@ class _GoodsItemState extends State<GoodsItem> {
   didChangeDependencies() {
     super.didChangeDependencies();
     shoppingCart = Provider.of<ShoppingCart>(context);
-    data = CartGoods(shoppingCart,
-        title: widget.item['name'],
-        choose: widget.item['units'].length > 1,
-        name: widget.item['units'][0]['name'],
-        price: widget.item['units'][0]['price'],
-        picture: widget.item['units'][0]['picture'],
-        id: widget.item['units'][0]['id'],
-        quantity: 0,
-        goodsId: widget.item['units'][0]['goodsId'],
-        canSaleQty: 10,
-        categoryId: widget.item['units'][0]['categoryId']);
+    data = CartGoods.fromJSON(shoppingCart, this.widget.item);
   }
 
   String get picture {
@@ -68,6 +59,15 @@ class _GoodsItemState extends State<GoodsItem> {
   void changeHandler(int newer, int old) {
     shoppingCart.putIfAbsent(this.data);
     this.data.changeQuantity(newer);
+  }
+
+  void chooseHandler() {
+    showDialog(
+      context: context,
+      builder: (BuildContext _) {
+        return ChooseUnit(this.data);
+      }
+    );
   }
 
   @override
@@ -100,7 +100,7 @@ class _GoodsItemState extends State<GoodsItem> {
                             shape: StadiumBorder(),
                             padding: EdgeInsets.symmetric(
                                 vertical: 5, horizontal: 10),
-                            onPressed: () {},
+                            onPressed: this.chooseHandler,
                             child: Text('选规格', style: TextStyle(fontSize: 11)),
                           )
                         ],
