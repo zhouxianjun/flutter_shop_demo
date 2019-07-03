@@ -78,7 +78,8 @@ abstract class _CartGoods with Store {
     price = unit['price'];
     picture = unit['picture'];
     id = unit['id'];
-    quantity = 0;
+    CartGoods tmp = shoppingCart.data.singleWhere((item) => item.id == id, orElse: () => null);
+    quantity = tmp?.quantity ?? 0;
     goodsId = unit['goodsId'];
     canSaleQty = unit['canSaleQty'];
     categoryId = unit['categoryId'];
