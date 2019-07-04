@@ -10,14 +10,18 @@ void collectionForVo(vo, String prefix, [name]) {
   } else if (vo is Map<String, dynamic>) {
     Map<String, List<String>> map = {};
     int minLength = 0;
-    vo.keys.where((String key) => key.startsWith(prefix) && key.endsWith('s')).forEach((key) {
+    vo.keys
+        .where((String key) => key.startsWith(prefix) && key.endsWith('s'))
+        .forEach((key) {
       String newerKey = key.substring(prefix.length, key.length - 1);
-      newerKey = '${newerKey.substring(0, 1).toLowerCase()}${newerKey.substring(1)}';
+      newerKey =
+          '${newerKey.substring(0, 1).toLowerCase()}${newerKey.substring(1)}';
       List<String> val = vo[key].toString().split(',');
       map[newerKey] = val;
       minLength = minLength == 0 ? val.length : min(minLength, val.length);
     });
-    vo[name ?? '${prefix}s'] = List<Map<String, dynamic>>.generate(minLength, (index) {
+    vo[name ?? '${prefix}s'] =
+        List<Map<String, dynamic>>.generate(minLength, (index) {
       Map<String, dynamic> obj = {};
       map.forEach((key, val) => obj[key] = val[index]);
       return obj;
@@ -30,15 +34,34 @@ void collectionForVo(vo, String prefix, [name]) {
  * @param {Number | String} val 源数字
  * @param {Number} count 小数位数
  */
-String forceDecimal(num val, { count = 2 }) {
-    final String str = val.toString();
-    final List<String> list = str.split('.');
-    final String start = list[0];
-    final String end = list.length > 1 ? list[1] : '';
-    String v = end.length > count ? end.substring(0, count) : end.padRight(count, '0');
-    return '$start.$v';
+String forceDecimal(num val, {count = 2}) {
+  final String str = val.toString();
+  final List<String> list = str.split('.');
+  final String start = list[0];
+  final String end = list.length > 1 ? list[1] : '';
+  String v =
+      end.length > count ? end.substring(0, count) : end.padRight(count, '0');
+  return '$start.$v';
 }
 
 String forceMoney(num money) {
   return forceDecimal(money / 100);
+}
+
+Future<Duration> waitGet(bool Function(Duration time) test,
+    {duration = const Duration(milliseconds: 100),
+    Duration time = Duration.zero}) async {
+  bool ok = test(time);
+  if (!ok) {
+    Duration delay;
+    if (duration is Function) {
+      delay = await duration(time);
+    } else {
+      delay = duration;
+    }
+    time += delay;
+    return await Future.delayed(
+        delay, () => waitGet(test, duration: duration, time: time));
+  }
+  return time;
 }
