@@ -1,11 +1,16 @@
 import 'package:flutter_shop_demo/store/cart-goods.dart';
+import 'package:flutter_shop_demo/store/mine/mine.dart';
 import 'package:mobx/mobx.dart';
 
 part 'shopping-cart.g.dart';
 
-class ShoppingCart = _ShoppingCart with _$ShoppingCart;
+class ShoppingCartStore = _ShoppingCart with _$ShoppingCartStore;
 
 abstract class _ShoppingCart with Store {
+  final MineStore mineStore;
+
+  _ShoppingCart(this.mineStore);
+
   @observable
   ObservableList<CartGoods> data = ObservableList<CartGoods>();
 
@@ -47,27 +52,31 @@ abstract class _ShoppingCart with Store {
     this.data.removeWhere((item) => item.id == id);
   }
 
-  // @computed get isAllSpecial {
-  //     const { specialGoodsCategory } = UserStore;
-  //     return this.data.every(item => item.categoryId === specialGoodsCategory);
-  // }
+  @computed
+  bool get isAllSpecial {
+    return this.data.every(
+        (item) => item.categoryId == this.mineStore.specialGoodsCategory);
+  }
 
-  // @computed get deliveryFee () {
-  //     const { deliveryFee } = UserStore;
-  //     return this.isNeedDeliveryFee ? deliveryFee : 0;
-  // }
+  @computed
+  int get deliveryFee {
+    return this.isNeedDeliveryFee ? this.mineStore.deliveryFee : 0;
+  }
 
-  // @computed get isNeedDeliveryFee () {
-  //     const { deliveryFee, freeDelivery } = UserStore;
-  //     return !this.isAllSpecial && deliveryFee > 0 && this.price < freeDelivery;
-  // }
+  @computed
+  bool get isNeedDeliveryFee {
+    return !this.isAllSpecial &&
+        this.mineStore.deliveryFee > 0 &&
+        this.price < this.mineStore.freeDelivery;
+  }
 
-  // @computed get amount () {
-  //     return ((this.price + this.deliveryFee) / 100).toFixed(2);
-  // }
+  @computed
+  String get amount {
+    return ((this.price + this.deliveryFee) / 100).toStringAsFixed(2);
+  }
 
-  // @computed get discount () {
-  //     const { deliveryFee } = UserStore;
-  //     return !this.isNeedDeliveryFee ? deliveryFee : 0;
-  // }
+  @computed
+  int get discount {
+    return !this.isNeedDeliveryFee ? this.mineStore.deliveryFee : 0;
+  }
 }

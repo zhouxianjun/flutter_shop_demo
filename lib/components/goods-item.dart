@@ -26,12 +26,12 @@ class GoodsItem extends StatefulWidget {
 
 class _GoodsItemState extends State<GoodsItem> {
   CartGoods data;
-  ShoppingCart shoppingCart;
+  ShoppingCartStore shoppingCart;
 
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
-    shoppingCart = Provider.of<ShoppingCart>(context);
+    shoppingCart = Provider.of<ShoppingCartStore>(context);
     data = CartGoods.fromJSON(shoppingCart, this.widget.item);
   }
 

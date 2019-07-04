@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_shop_demo/store/mine/mine.dart';
+import 'package:provider/provider.dart';
 
 class Mine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    MineStore mineStore = Provider.of<MineStore>(context);
+    mineStore.loadAuthInfo();
     return Scaffold(
       appBar: AppBar(title: Text('我的')),
       body: Column(
@@ -27,9 +32,12 @@ class Mine extends StatelessWidget {
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 10),
-                        child: Text(
-                          'Alone',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        child: Observer(
+                          builder: (_) => Text(
+                                mineStore.nickname,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
                         ),
                       ),
                     ],
@@ -45,7 +53,10 @@ class Mine extends StatelessWidget {
               itemBuilder: (context, i) {
                 return ListTile(
                   // leading: CircleAvatar(backgroundImage: NetworkImage('https://cdn.jsdelivr.net/gh/flutterchina/website@1.0/images/flutter-mark-square-100.png'),),
-                  leading: Icon(Icons.list, size: 36,),
+                  leading: Icon(
+                    Icons.list,
+                    size: 36,
+                  ),
                   title: Text('订单列表-$i'),
                   trailing: Icon(Icons.keyboard_arrow_right),
                 );

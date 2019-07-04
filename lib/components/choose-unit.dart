@@ -19,13 +19,13 @@ class ChooseUnit extends StatefulWidget {
 }
 
 class _ChooseUnitState extends State<ChooseUnit> {
-  ShoppingCart shoppingCart;
+  ShoppingCartStore shoppingCart;
   CartGoods unit;
 
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
-    shoppingCart = Provider.of<ShoppingCart>(context);
+    shoppingCart = Provider.of<ShoppingCartStore>(context);
     unit = shoppingCart.data.firstWhere(
         (item) =>
             item.goodsId == this.widget.goods.goodsId && item.quantity > 0,

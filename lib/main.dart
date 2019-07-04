@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
-import 'package:flutter_shop_demo/store/mine.dart';
 import 'package:provider/provider.dart';
 import 'views/home/index.dart';
-import 'store/counter.dart';
-import 'package:flutter_shop_demo/store/shopping-cart.dart';
 import './routers.dart';
+import 'package:flutter_shop_demo/store/index.dart';
 
 void main() => runApp(MultiProvider(
-  providers: [
-    Provider<Counter>(builder: (_) => Counter()),
-    Provider<ShoppingCartStore>(builder: (_) => ShoppingCartStore(),),
-    Provider<MineStore>(builder: (_) => MineStore(),)
-  ],
-  child: MyApp(),
-));
+      providers: providers,
+      child: MyApp(),
+    ));
 
 class MyApp extends StatelessWidget {
-  MyApp () {
+  MyApp() {
     final Router router = new Router();
     Routers.configureRoutes(router);
   }
@@ -27,14 +21,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        buttonTheme: ButtonThemeData(
-          minWidth: 0,
-          height: 0,
-          padding: EdgeInsets.zero,
-          buttonColor: Colors.transparent
-        )
-      ),
+          primarySwatch: Colors.blue,
+          buttonTheme: ButtonThemeData(
+              minWidth: 0,
+              height: 0,
+              padding: EdgeInsets.zero,
+              buttonColor: Colors.transparent)),
       home: Home(),
       onGenerateRoute: Routers.router.generator,
       navigatorObservers: [RouterObserver()],

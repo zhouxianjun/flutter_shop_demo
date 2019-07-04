@@ -6,7 +6,7 @@ part 'cart-goods.g.dart';
 class CartGoods = _CartGoods with _$CartGoods;
 
 abstract class _CartGoods with Store {
-  final ShoppingCart shoppingCart;
+  final ShoppingCartStore shoppingCart;
   /**
    * 商品名称
    */

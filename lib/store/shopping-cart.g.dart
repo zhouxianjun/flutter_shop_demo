@@ -8,7 +8,7 @@ part of 'shopping-cart.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars
 
-mixin _$ShoppingCart on _ShoppingCart, Store {
+mixin _$ShoppingCartStore on _ShoppingCart, Store {
   Computed<int> _$totalComputed;
 
   @override
@@ -17,6 +17,33 @@ mixin _$ShoppingCart on _ShoppingCart, Store {
 
   @override
   int get price => (_$priceComputed ??= Computed<int>(() => super.price)).value;
+  Computed<bool> _$isAllSpecialComputed;
+
+  @override
+  bool get isAllSpecial =>
+      (_$isAllSpecialComputed ??= Computed<bool>(() => super.isAllSpecial))
+          .value;
+  Computed<int> _$deliveryFeeComputed;
+
+  @override
+  int get deliveryFee =>
+      (_$deliveryFeeComputed ??= Computed<int>(() => super.deliveryFee)).value;
+  Computed<bool> _$isNeedDeliveryFeeComputed;
+
+  @override
+  bool get isNeedDeliveryFee => (_$isNeedDeliveryFeeComputed ??=
+          Computed<bool>(() => super.isNeedDeliveryFee))
+      .value;
+  Computed<String> _$amountComputed;
+
+  @override
+  String get amount =>
+      (_$amountComputed ??= Computed<String>(() => super.amount)).value;
+  Computed<int> _$discountComputed;
+
+  @override
+  int get discount =>
+      (_$discountComputed ??= Computed<int>(() => super.discount)).value;
 
   final _$dataAtom = Atom(name: '_ShoppingCart.data');
 

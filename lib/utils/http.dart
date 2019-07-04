@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_shop_demo/constant.dart';
 import 'package:flutter_shop_demo/routers.dart';
-import 'package:flutter_shop_demo/store/mine.dart';
+import 'package:flutter_shop_demo/store/mine/mine.dart';
 import 'package:flutter_shop_demo/utils/common.dart' show waitGet;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -77,7 +77,7 @@ class Http {
         };
       };
     }
-    dio.interceptors.add(LogInterceptor(responseBody: false));
+    dio.interceptors.add(LogInterceptor(responseBody: true));
     return dio;
   }
 

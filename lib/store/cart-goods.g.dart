@@ -9,6 +9,15 @@ part of 'cart-goods.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars
 
 mixin _$CartGoods on _CartGoods, Store {
+  Computed<int> _$maxComputed;
+
+  @override
+  int get max => (_$maxComputed ??= Computed<int>(() => super.max)).value;
+  Computed<int> _$haveComputed;
+
+  @override
+  int get have => (_$haveComputed ??= Computed<int>(() => super.have)).value;
+
   final _$quantityAtom = Atom(name: '_CartGoods.quantity');
 
   @override
