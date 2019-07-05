@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_shop_demo/components/shopping-cart.dart';
 import 'package:flutter_shop_demo/routers.dart';
 import '../../constant.dart';
 import '../../utils/http.dart';
@@ -19,9 +20,13 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     globalContext = this.context;
-    print('来了....');
-    this._loadCategory();
     super.initState();
+    this._loadCategory();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   void _loadCategory() async {
@@ -90,6 +95,8 @@ class _HomeState extends State<Home> {
           )
         ],
       ),
+      floatingActionButton: ShoppingCart(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Row(
         children: <Widget>[
           Expanded(

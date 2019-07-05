@@ -64,6 +64,11 @@ abstract class _ShoppingCart with Store {
   }
 
   @computed
+  int get freeDelivery {
+    return this.mineStore.freeDelivery;
+  }
+
+  @computed
   bool get isNeedDeliveryFee {
     return !this.isAllSpecial &&
         this.mineStore.deliveryFee > 0 &&
