@@ -33,7 +33,7 @@ abstract class _MineStore with Store {
 
   @action
   loadAuthInfo({force: false}) async {
-    Response<Map> res =
+    Response res =
         await Http.dio.get('/info', queryParameters: {'force': force});
     if (res.data != null && res.data['success']) {
       this.specialGoodsCategory = res.data['data']['specialGoodsCategory'];

@@ -28,6 +28,12 @@ mixin _$ShoppingCartStore on _ShoppingCart, Store {
   @override
   int get deliveryFee =>
       (_$deliveryFeeComputed ??= Computed<int>(() => super.deliveryFee)).value;
+  Computed<int> _$freeDeliveryComputed;
+
+  @override
+  int get freeDelivery =>
+      (_$freeDeliveryComputed ??= Computed<int>(() => super.freeDelivery))
+          .value;
   Computed<bool> _$isNeedDeliveryFeeComputed;
 
   @override
@@ -44,6 +50,22 @@ mixin _$ShoppingCartStore on _ShoppingCart, Store {
   @override
   int get discount =>
       (_$discountComputed ??= Computed<int>(() => super.discount)).value;
+
+  final _$mineStoreAtom = Atom(name: '_ShoppingCart.mineStore');
+
+  @override
+  MineStore get mineStore {
+    _$mineStoreAtom.reportObserved();
+    return super.mineStore;
+  }
+
+  @override
+  set mineStore(MineStore value) {
+    _$mineStoreAtom.context
+        .checkIfStateModificationsAreAllowed(_$mineStoreAtom);
+    super.mineStore = value;
+    _$mineStoreAtom.reportChanged();
+  }
 
   final _$dataAtom = Atom(name: '_ShoppingCart.data');
 

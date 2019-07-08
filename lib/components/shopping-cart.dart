@@ -22,8 +22,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
   }
 
   Widget _renderPrice() {
-    int deliveryFee = this.store.deliveryFee;
-    bool haveDelivery = deliveryFee > 0;
+    bool haveDelivery = this.store.deliveryFee > 0;
     Widget price = Align(
       alignment: Alignment.center,
       child: Text(

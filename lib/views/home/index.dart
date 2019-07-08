@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_shop_demo/components/shopping-cart.dart';
+import 'package:flutter_shop_demo/constant.dart';
 import 'package:flutter_shop_demo/routers.dart';
-import '../../constant.dart';
 import '../../utils/http.dart';
 import 'package:flutter_shop_demo/components/goods-list.dart';
 
@@ -24,13 +24,8 @@ class _HomeState extends State<Home> {
     this._loadCategory();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
   void _loadCategory() async {
-    Response<Map<String, dynamic>> res = await Http.dio.get(
+    Response res = await Http.dio.get(
         '/api/shop/index/category',
         options: Options(extra: {'loading': true}));
     bool success = res.data['success'];

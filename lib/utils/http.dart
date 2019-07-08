@@ -65,7 +65,7 @@ class Http {
         }
       }
       _showErrorMsg(e, msg);
-      return dio.resolve(e.response);
+      return dio.resolve(e.response ?? {'success': false});
     }));
     if (Config.PROXY != null) {
       (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
+import 'package:flutter_shop_demo/views/home/index.dart';
 import 'package:provider/provider.dart';
-import 'views/home/index.dart';
 import './routers.dart';
 import 'package:flutter_shop_demo/store/index.dart';
 

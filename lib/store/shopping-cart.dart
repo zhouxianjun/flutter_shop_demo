@@ -7,9 +7,13 @@ part 'shopping-cart.g.dart';
 class ShoppingCartStore = _ShoppingCart with _$ShoppingCartStore;
 
 abstract class _ShoppingCart with Store {
-  final MineStore mineStore;
+  @observable
+  MineStore mineStore;
 
-  _ShoppingCart(this.mineStore);
+  _ShoppingCart(MineStore mineStore) {
+    this.mineStore = mineStore;
+    this.mineStore.loadAuthInfo(force: true);
+  }
 
   @observable
   ObservableList<CartGoods> data = ObservableList<CartGoods>();
@@ -54,7 +58,7 @@ abstract class _ShoppingCart with Store {
 
   @computed
   bool get isAllSpecial {
-    return this.data.every(
+    return this.data.isEmpty ? false : this.data.every(
         (item) => item.categoryId == this.mineStore.specialGoodsCategory);
   }
 
