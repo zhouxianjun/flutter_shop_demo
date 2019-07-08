@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_shop_demo/components/shopping-cart.dart';
 import 'package:flutter_shop_demo/constant.dart';
 import 'package:flutter_shop_demo/routers.dart';
@@ -25,8 +26,7 @@ class _HomeState extends State<Home> {
   }
 
   void _loadCategory() async {
-    Response res = await Http.dio.get(
-        '/api/shop/index/category',
+    Response res = await Http.dio.get('/api/shop/index/category',
         options: Options(extra: {'loading': true}));
     bool success = res.data['success'];
     if (success) {
@@ -92,23 +92,29 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: ShoppingCart(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body: Row(
-        children: <Widget>[
-          Expanded(
-            flex: 1,
-            child: ListView(
-              children: ListTile.divideTiles(
-                  context: context,
-                  tiles: this
-                      .categorys
-                      .map((item) => _renderCategoryItem(item))).toList(),
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              flex: 1,
+              child: ListView(
+                children: ListTile.divideTiles(
+                    context: context,
+                    tiles: this
+                        .categorys
+                        .map((item) => _renderCategoryItem(item))).toList(),
+              ),
             ),
-          ),
-          Expanded(
-            flex: 2,
-            child: GoodsList(this.selected),
-          )
-        ],
+            Expanded(
+              flex: 2,
+              child: GoodsList(this.selected),
+            )
+          ],
+        ),
       ),
     );
   }
