@@ -1,9 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutter_shop_demo/store/cart-goods.dart';
+import 'package:flutter_shop_demo/store/shopping-cart.dart';
 import 'package:flutter_shop_demo/utils/http.dart';
 import 'package:flutter_shop_demo/utils/common.dart' show collectionForVo;
 import 'package:flutter_shop_demo/components/goods-item.dart';
+import 'package:provider/provider.dart';
 
 class GoodsList extends StatefulWidget {
   final int category;
@@ -19,8 +22,9 @@ class GoodsList extends StatefulWidget {
 class _GoodsListState extends State<GoodsList> {
   int pageNum = 1;
   int pageSize = 10;
-  List list = [];
+  List<CartGoods> list = [];
   ValueNotifier<int> categoryWatch = ValueNotifier(-1);
+  ShoppingCartStore shoppingCart;
 
   @override
   void initState() {
@@ -29,6 +33,12 @@ class _GoodsListState extends State<GoodsList> {
       print('分类改变了: ${categoryWatch.value}');
       this.refresh();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    shoppingCart = Provider.of<ShoppingCartStore>(context);
   }
 
   @override
@@ -61,24 +71,10 @@ class _GoodsListState extends State<GoodsList> {
     if (res.data != null && res.data['success']) {
       final List data = res.data['value']['list'] ?? [];
       collectionForVo(data, 'unit');
-      data.forEach((item) {
-        List units = (item['units'] as List).map((v) {
-          v = v as Map;
-          v['quantity'] = 0;
-          v['id'] = num.parse(v['id']);
-          v['price'] = num.parse(v['price']);
-          v['goodsId'] = item['id'];
-          v['canSaleQty'] = item['canSaleQty'];
-          v['categoryId'] = item['categoryId'];
-          return v;
-        }).toList();
-        units.sort((a, b) => a['price'] - b['price']);
-        item['units'] = units;
-      });
-      print(data);
+      final List<CartGoods> goodsList = data.map((item) => CartGoods.fromJSON(shoppingCart, item)).toList();
       setState(() {
         this.pageNum++;
-        this.list.addAll(data);
+        this.list.addAll(goodsList);
       });
     }
   }

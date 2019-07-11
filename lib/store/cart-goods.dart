@@ -67,7 +67,7 @@ abstract class _CartGoods with Store {
     Map unit;
     if (map.containsKey('units')) {
       unit = map['units'][0];
-      units = map['units'];
+      this.parseUnits(map);
     } else {
       unit = map;
       units = [];
@@ -78,11 +78,16 @@ abstract class _CartGoods with Store {
     price = unit['price'];
     picture = unit['picture'];
     id = unit['id'];
-    CartGoods tmp = shoppingCart.data.singleWhere((item) => item.id == id, orElse: () => null);
+    CartGoods tmp = shoppingCart.data
+        .singleWhere((item) => item.id == id, orElse: () => null);
     quantity = tmp?.quantity ?? 0;
     goodsId = unit['goodsId'];
     canSaleQty = unit['canSaleQty'];
     categoryId = unit['categoryId'];
+  }
+
+  bool get isChoose {
+    return this.units.length > 1;
   }
 
   /**
@@ -110,5 +115,20 @@ abstract class _CartGoods with Store {
   @action
   void changeQuantity(int quantity) {
     this.quantity = quantity;
+  }
+
+  void parseUnits(Map map) {
+    List units = (map['units'] as List).map((v) {
+      v = v as Map;
+      v['quantity'] = 0;
+      v['id'] = num.parse(v['id']);
+      v['price'] = num.parse(v['price']);
+      v['goodsId'] = map['id'];
+      v['canSaleQty'] = map['canSaleQty'];
+      v['categoryId'] = map['categoryId'];
+      return v;
+    }).toList();
+    units.sort((a, b) => a['price'] - b['price']);
+    this.units = units;
   }
 }

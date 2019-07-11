@@ -5,13 +5,14 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_shop_demo/components/choose-unit.dart';
 import 'package:flutter_shop_demo/config.dart';
 import 'package:flutter_shop_demo/components/number-input.dart';
+import 'package:flutter_shop_demo/routers.dart';
 import 'package:flutter_shop_demo/store/cart-goods.dart';
 import 'package:flutter_shop_demo/store/shopping-cart.dart';
 import 'package:flutter_shop_demo/utils/common.dart' show forceMoney;
 import 'package:provider/provider.dart';
 
 class GoodsItem extends StatefulWidget {
-  final dynamic item;
+  final CartGoods item;
   final VoidCallback onChoose;
   final bool edit;
 
@@ -25,58 +26,56 @@ class GoodsItem extends StatefulWidget {
 }
 
 class _GoodsItemState extends State<GoodsItem> {
-  CartGoods data;
   ShoppingCartStore shoppingCart;
 
   @override
   didChangeDependencies() {
     super.didChangeDependencies();
     shoppingCart = Provider.of<ShoppingCartStore>(context);
-    data = CartGoods.fromJSON(shoppingCart, this.widget.item);
   }
 
   String get picture {
-    final String url = this.data.picture;
+    final String url = this.widget.item.picture;
     return '${Config.IMG_ADDRESS}$url';
   }
 
   String get title {
-    return this.data.title;
+    return this.widget.item.title;
   }
 
   String get name {
-    return this.data.name;
+    return this.widget.item.name;
   }
 
   bool get choose {
-    return this.data.choose;
+    return this.widget.item.choose;
   }
 
   String get price {
-    return forceMoney(this.data.price);
+    return forceMoney(this.widget.item.price);
   }
 
   void changeHandler(int newer, int old) {
-    shoppingCart.putIfAbsent(this.data);
-    this.data.changeQuantity(newer);
+    shoppingCart.putIfAbsent(this.widget.item);
+    this.widget.item.changeQuantity(newer);
   }
 
   void chooseHandler() {
     showDialog(
         context: context,
         builder: (BuildContext _) {
-          return ChooseUnit(this.data);
+          return ChooseUnit(this.widget.item);
         });
   }
 
   Widget get renderAdd {
     return Observer(
       builder: (_) {
-        return this.data.quantity > 0
+        return this.widget.item.quantity > 0
             ? NumberInput(
-                value: this.data.quantity,
+                value: this.widget.item.quantity,
                 min: 0,
-                max: this.data.max,
+                max: this.widget.item.max,
                 onChange: this.changeHandler,
               )
             : FlatButton(
@@ -104,7 +103,7 @@ class _GoodsItemState extends State<GoodsItem> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () => Routers.router.navigateTo(context, '/detail/${this.widget.item.goodsId}'),
       child: Row(
         children: <Widget>[
           Image.network(this.picture,
