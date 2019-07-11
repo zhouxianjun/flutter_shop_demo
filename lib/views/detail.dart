@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutter_shop_demo/components/goods-item.dart';
+import 'package:flutter_shop_demo/components/shopping-cart.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_shop_demo/routers.dart';
 import 'package:flutter_shop_demo/store/cart-goods.dart';
@@ -75,9 +77,10 @@ class _GoodsDetailState extends State<GoodsDetail>
   }
 
   double get frontOpacity {
-    return this.y > _ExpandedHeight
+    final h = _ExpandedHeight * 0.6;
+    return this.y > h
         ? 0
-        : ((_ExpandedHeight - this.y) / _ExpandedHeight).clamp(0.0, 1.0);
+        : ((h - this.y) / h).clamp(0.0, 1.0);
   }
 
   double get backendOpacity {
@@ -177,14 +180,16 @@ class _GoodsDetailState extends State<GoodsDetail>
         title: this._renderTitle(),
         actions: this._renderActions(),
         backgroundColor: Colors.white,
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         expandedHeight: _ExpandedHeight,
         flexibleSpace: FlexibleSpaceBar(
           background: this._renderSwiper(),
-          // background: Image.asset('assets/images/my.jpeg', fit: BoxFit.fill),
-          // background: Container(
-          //   color: Colors.red,
-          // ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.only(top: 15),
+          child: GoodsItem(this.cartGoods),
         ),
       ),
       SliverFixedExtentList(
@@ -195,19 +200,13 @@ class _GoodsDetailState extends State<GoodsDetail>
     ];
   }
 
-  Widget _body1() {
+  Widget _body() {
     return EasyRefresh(
-      onRefresh: () {},
+      onRefresh: this.load,
       child: CustomScrollView(
         controller: _scrollController,
         slivers: this._slivers(),
       ),
-    );
-  }
-
-  Widget _body2() {
-    return CustomScrollView(
-      slivers: <Widget>[],
     );
   }
 
@@ -221,34 +220,9 @@ class _GoodsDetailState extends State<GoodsDetail>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _body1(),
+      body: _body(),
+      floatingActionButton: ShoppingCart(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
-  }
-}
-
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  final double minHeight;
-  final double maxHeight;
-  final Widget child;
-
-  _SliverAppBarDelegate(this.minHeight, this.maxHeight, this.child);
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return SizedBox.expand(child: child);
-  }
-
-  @override
-  double get maxExtent => math.max(maxHeight, minHeight);
-
-  @override
-  double get minExtent => minHeight;
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return maxHeight != oldDelegate.maxHeight ||
-        minHeight != oldDelegate.minHeight ||
-        child != oldDelegate.child;
   }
 }
