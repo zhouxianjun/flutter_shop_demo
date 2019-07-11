@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:flutter_shop_demo/routers.dart';
 import 'package:flutter_shop_demo/store/cart-goods.dart';
 import 'package:flutter_shop_demo/store/shopping-cart.dart';
@@ -10,7 +11,7 @@ import 'package:flutter_shop_demo/utils/common.dart';
 import 'package:flutter_shop_demo/utils/http.dart';
 import 'package:provider/provider.dart';
 
-const double _ExpandedHeight = 300;
+const double _ExpandedHeight = 400;
 
 class GoodsDetail extends StatefulWidget {
   final int goodsId;
@@ -29,6 +30,7 @@ class _GoodsDetailState extends State<GoodsDetail>
   ScrollController _scrollController;
   TabController _tabController;
   double y;
+  CartGoods cartGoods;
 
   @override
   void initState() {
@@ -50,23 +52,27 @@ class _GoodsDetailState extends State<GoodsDetail>
     this.load();
   }
 
-  Future load () async {
-        Response result = await Http.dio.get('/api/shop/goods/info/${widget.goodsId}');
-        bool success = result.data['success'];
-        if (success) {
-            Map goods = result.data['value'] as Map;
-            collectionForVo(goods, 'unit');
-            CartGoods cartGoods = CartGoods.fromJSON(shoppingCart, goods);
-            // const item = { title: goods.name, choose, ...goods.units[0] };
-            // if (!choose) {
-            //     const cart = this.shoppingCart.find(v => v.id === goods.units[0].id);
-            //     if (cart) {
-            //         item.quantity = cart.quantity;
-            //     }
-            // }
-            // this.setState({ goods, item, loaded: true });
-        }
+  Future load() async {
+    Response<Map> result =
+        await Http.dio.get('/api/shop/goods/info/${widget.goodsId}');
+    bool success = result.data['success'];
+    if (success) {
+      Map goods = result.data['value'] as Map;
+      collectionForVo(goods, 'unit');
+      CartGoods cartGoods = CartGoods.fromJSON(shoppingCart, goods);
+      setState(() {
+        this.cartGoods = cartGoods;
+      });
+      // const item = { title: goods.name, choose, ...goods.units[0] };
+      // if (!choose) {
+      //     const cart = this.shoppingCart.find(v => v.id === goods.units[0].id);
+      //     if (cart) {
+      //         item.quantity = cart.quantity;
+      //     }
+      // }
+      // this.setState({ goods, item, loaded: true });
     }
+  }
 
   double get frontOpacity {
     return this.y > _ExpandedHeight
@@ -80,6 +86,10 @@ class _GoodsDetailState extends State<GoodsDetail>
         : ((this.y > _ExpandedHeight ? _ExpandedHeight : this.y) /
                 _ExpandedHeight)
             .clamp(0.0, 1.0);
+  }
+
+  List<String> get images {
+    return this.cartGoods?.images?.toList() ?? [];
   }
 
   Widget _renderBack() {
@@ -145,6 +155,19 @@ class _GoodsDetailState extends State<GoodsDetail>
     ];
   }
 
+  Widget _renderSwiper() {
+    return this.images.isNotEmpty
+        ? SafeArea(
+            child: Swiper(
+                itemBuilder: (_, int index) {
+                  return Image.network(this.images[index]);
+                },
+                itemCount: this.images.length,
+                pagination: SwiperPagination()),
+          )
+        : SizedBox();
+  }
+
   List<Widget> _slivers() {
     return [
       SliverAppBar(
@@ -154,12 +177,14 @@ class _GoodsDetailState extends State<GoodsDetail>
         title: this._renderTitle(),
         actions: this._renderActions(),
         backgroundColor: Colors.white,
+        brightness: Brightness.dark,
         expandedHeight: _ExpandedHeight,
         flexibleSpace: FlexibleSpaceBar(
+          background: this._renderSwiper(),
           // background: Image.asset('assets/images/my.jpeg', fit: BoxFit.fill),
-          background: Container(
-            color: Colors.red,
-          ),
+          // background: Container(
+          //   color: Colors.red,
+          // ),
         ),
       ),
       SliverFixedExtentList(

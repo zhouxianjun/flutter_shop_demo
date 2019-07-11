@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_shop_demo/components/choose-unit.dart';
-import 'package:flutter_shop_demo/config.dart';
 import 'package:flutter_shop_demo/components/number-input.dart';
 import 'package:flutter_shop_demo/routers.dart';
 import 'package:flutter_shop_demo/store/cart-goods.dart';
 import 'package:flutter_shop_demo/store/shopping-cart.dart';
-import 'package:flutter_shop_demo/utils/common.dart' show forceMoney;
 import 'package:provider/provider.dart';
 
 class GoodsItem extends StatefulWidget {
@@ -35,8 +33,7 @@ class _GoodsItemState extends State<GoodsItem> {
   }
 
   String get picture {
-    final String url = this.widget.item.picture;
-    return '${Config.IMG_ADDRESS}$url';
+    return this.widget.item.pictureUrl;
   }
 
   String get title {
@@ -52,7 +49,7 @@ class _GoodsItemState extends State<GoodsItem> {
   }
 
   String get price {
-    return forceMoney(this.widget.item.price);
+    return this.widget.item.priceFixed;
   }
 
   void changeHandler(int newer, int old) {

@@ -1,5 +1,8 @@
+import 'package:flutter_shop_demo/utils/common.dart';
 import 'package:mobx/mobx.dart';
 import 'package:flutter_shop_demo/store/shopping-cart.dart';
+
+import '../config.dart';
 
 part 'cart-goods.g.dart';
 
@@ -48,6 +51,10 @@ abstract class _CartGoods with Store {
    * 类别ID
    */
   int categoryId;
+  /**
+   * 图片逗号分隔
+   */
+  String imgs;
   List units;
 
   _CartGoods(this.shoppingCart,
@@ -66,8 +73,8 @@ abstract class _CartGoods with Store {
   _CartGoods.fromJSON(this.shoppingCart, Map map) {
     Map unit;
     if (map.containsKey('units')) {
-      unit = map['units'][0];
       this.parseUnits(map);
+      unit = this.units[0];
     } else {
       unit = map;
       units = [];
@@ -84,10 +91,28 @@ abstract class _CartGoods with Store {
     goodsId = unit['goodsId'];
     canSaleQty = unit['canSaleQty'];
     categoryId = unit['categoryId'];
+    imgs = map['imgs'];
   }
 
   bool get isChoose {
     return this.units.length > 1;
+  }
+
+  String get pictureUrl {
+    return '${Config.IMG_ADDRESS}$picture';
+  }
+
+  String get priceFixed {
+    return forceMoney(price);
+  }
+
+  Set<String> get images {
+    List<String> images = [];
+    if (this.imgs != null) {
+      images.addAll(this.imgs.split(','));
+    }
+    images.addAll(this.units.map((unit) => unit['picture']));
+    return images.where((img) => img != null && img.trim().isNotEmpty).map((img) => '${Config.IMG_ADDRESS}$img').toSet();
   }
 
   /**
