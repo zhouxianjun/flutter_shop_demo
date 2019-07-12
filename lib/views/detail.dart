@@ -1,7 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_shop_demo/components/goods-item.dart';
 import 'package:flutter_shop_demo/components/shopping-cart.dart';
@@ -12,14 +12,11 @@ import 'package:flutter_shop_demo/store/shopping-cart.dart';
 import 'package:flutter_shop_demo/utils/common.dart';
 import 'package:flutter_shop_demo/utils/http.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 const double _ExpandedHeight = 400;
 
 class GoodsDetail extends StatefulWidget {
-  final int goodsId;
-
-  GoodsDetail(this.goodsId);
-
   @override
   State<StatefulWidget> createState() {
     return _GoodsDetailState();
@@ -51,36 +48,30 @@ class _GoodsDetailState extends State<GoodsDetail>
   void didChangeDependencies() {
     super.didChangeDependencies();
     shoppingCart = Provider.of<ShoppingCartStore>(context);
-    this.load();
+    Object obj = ModalRoute.of(context).settings.arguments;
+    assert(obj is CartGoods);
+    setState(() {
+      this.cartGoods = obj;
+    });
   }
 
   Future load() async {
     Response<Map> result =
-        await Http.dio.get('/api/shop/goods/info/${widget.goodsId}');
+        await Http.dio.get('/api/shop/goods/info/${this.cartGoods.goodsId}');
     bool success = result.data['success'];
     if (success) {
       Map goods = result.data['value'] as Map;
       collectionForVo(goods, 'unit');
-      CartGoods cartGoods = CartGoods.fromJSON(shoppingCart, goods);
+      CartGoods cartGoods = CartGoods.getOrCreate(shoppingCart, goods);
       setState(() {
-        this.cartGoods = cartGoods;
+        this.cartGoods.update(cartGoods);
       });
-      // const item = { title: goods.name, choose, ...goods.units[0] };
-      // if (!choose) {
-      //     const cart = this.shoppingCart.find(v => v.id === goods.units[0].id);
-      //     if (cart) {
-      //         item.quantity = cart.quantity;
-      //     }
-      // }
-      // this.setState({ goods, item, loaded: true });
     }
   }
 
   double get frontOpacity {
     final h = _ExpandedHeight * 0.6;
-    return this.y > h
-        ? 0
-        : ((h - this.y) / h).clamp(0.0, 1.0);
+    return this.y > h ? 0 : ((h - this.y) / h).clamp(0.0, 1.0);
   }
 
   double get backendOpacity {
@@ -93,6 +84,10 @@ class _GoodsDetailState extends State<GoodsDetail>
 
   List<String> get images {
     return this.cartGoods?.images?.toList() ?? [];
+  }
+
+  String get detail {
+    return this.cartGoods?.detail ?? '<div/>';
   }
 
   Widget _renderBack() {
@@ -163,7 +158,10 @@ class _GoodsDetailState extends State<GoodsDetail>
         ? SafeArea(
             child: Swiper(
                 itemBuilder: (_, int index) {
-                  return Image.network(this.images[index]);
+                  return CachedNetworkImage(
+                    imageUrl: this.images[index],
+                    placeholder: (_, url) => CircularProgressIndicator(),
+                  );
                 },
                 itemCount: this.images.length,
                 pagination: SwiperPagination()),
@@ -171,32 +169,45 @@ class _GoodsDetailState extends State<GoodsDetail>
         : SizedBox();
   }
 
+  Widget _renderAppBar() {
+    return SliverAppBar(
+      pinned: true,
+      leading: this._renderBack(),
+      title: this._renderTitle(),
+      actions: this._renderActions(),
+      backgroundColor: Colors.white,
+      brightness: Brightness.light,
+      expandedHeight: _ExpandedHeight,
+      flexibleSpace: FlexibleSpaceBar(
+        background: this._renderSwiper(),
+      ),
+    );
+  }
+
+  Widget _renderGoodsItem() {
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: EdgeInsets.only(top: 15),
+        color: Colors.white,
+        child: this.cartGoods == null ? SizedBox() : GoodsItem(this.cartGoods),
+      ),
+    );
+  }
+
+  Widget _renderDetail() {
+    return SliverToBoxAdapter(
+      child: Html(
+        padding: EdgeInsets.only(top: 15, bottom: ShoppingCart.HEIGHT),
+        data: this.detail,
+      ),
+    );
+  }
+
   List<Widget> _slivers() {
     return [
-      SliverAppBar(
-        pinned: true,
-        leading: this._renderBack(),
-        automaticallyImplyLeading: false,
-        title: this._renderTitle(),
-        actions: this._renderActions(),
-        backgroundColor: Colors.white,
-        brightness: Brightness.light,
-        expandedHeight: _ExpandedHeight,
-        flexibleSpace: FlexibleSpaceBar(
-          background: this._renderSwiper(),
-        ),
-      ),
-      SliverToBoxAdapter(
-        child: Padding(
-          padding: EdgeInsets.only(top: 15),
-          child: GoodsItem(this.cartGoods),
-        ),
-      ),
-      SliverFixedExtentList(
-        delegate: SliverChildListDelegate(List.generate(
-            16, (int index) => ListTile(title: Text('data - $index')))),
-        itemExtent: 60,
-      )
+      this._renderAppBar(),
+      this._renderGoodsItem(),
+      this._renderDetail()
     ];
   }
 

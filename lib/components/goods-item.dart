@@ -8,6 +8,7 @@ import 'package:flutter_shop_demo/routers.dart';
 import 'package:flutter_shop_demo/store/cart-goods.dart';
 import 'package:flutter_shop_demo/store/shopping-cart.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class GoodsItem extends StatefulWidget {
   final CartGoods item;
@@ -32,47 +33,55 @@ class _GoodsItemState extends State<GoodsItem> {
     shoppingCart = Provider.of<ShoppingCartStore>(context);
   }
 
+  CartGoods get cartGoods {
+    return this.widget.item;
+  }
+
   String get picture {
-    return this.widget.item.pictureUrl;
+    return this.cartGoods.pictureUrl;
   }
 
   String get title {
-    return this.widget.item.title;
+    return this.cartGoods.title;
   }
 
   String get name {
-    return this.widget.item.name;
+    return this.cartGoods.name;
   }
 
   bool get choose {
-    return this.widget.item.choose;
+    return this.cartGoods.choose;
+  }
+
+  int get quantity {
+    return this.cartGoods.quantity;
   }
 
   String get price {
-    return this.widget.item.priceFixed;
+    return this.cartGoods.priceFixed;
   }
 
   void changeHandler(int newer, int old) {
-    shoppingCart.putIfAbsent(this.widget.item);
-    this.widget.item.changeQuantity(newer);
+    shoppingCart.putIfAbsent(this.cartGoods);
+    this.cartGoods.changeQuantity(newer);
   }
 
   void chooseHandler() {
     showDialog(
         context: context,
         builder: (BuildContext _) {
-          return ChooseUnit(this.widget.item);
+          return ChooseUnit(this.cartGoods);
         });
   }
 
   Widget get renderAdd {
     return Observer(
       builder: (_) {
-        return this.widget.item.quantity > 0
+        return this.quantity > 0
             ? NumberInput(
-                value: this.widget.item.quantity,
+                value: this.quantity,
                 min: 0,
-                max: this.widget.item.max,
+                max: this.cartGoods.max,
                 onChange: this.changeHandler,
               )
             : FlatButton(
@@ -99,61 +108,70 @@ class _GoodsItemState extends State<GoodsItem> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => Routers.router.navigateTo(context, '/detail/${this.widget.item.goodsId}'),
-      child: Row(
-        children: <Widget>[
-          Image.network(this.picture,
-              width: 60, height: 60, fit: BoxFit.contain),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Align(
-                    alignment: Alignment.topLeft,
-                    child: Text(this.title,
-                        style: TextStyle(fontSize: 14, color: Colors.black))),
-                this.choose
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Text('¥$price',
-                              style: TextStyle(
-                                  fontSize: 12, color: Colors.red[300])),
-                          FlatButton(
-                            color: Colors.red[300],
-                            textColor: Colors.white,
-                            shape: StadiumBorder(),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 5, horizontal: 10),
-                            onPressed: this.chooseHandler,
-                            child: Text('选规格', style: TextStyle(fontSize: 11)),
-                          )
-                        ],
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(this.name,
-                                  style: TextStyle(
-                                      fontSize: 11, color: Colors.grey)),
-                              Text('¥$price',
-                                  style: TextStyle(
-                                      fontSize: 12, color: Colors.red[300]))
-                            ],
-                          ),
-                          this.renderAdd
-                        ],
-                      )
-              ],
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+      child: InkWell(
+        onTap: () => Navigator.pushNamed(context, Routers.DETAIL, arguments: this.cartGoods),
+        child: Row(
+          children: <Widget>[
+            CachedNetworkImage(
+              imageUrl: this.picture,
+              width: 60,
+              height: 60,
+              fit: BoxFit.contain,
+              placeholder: (_, url) => CircularProgressIndicator(),
             ),
-          )
-        ],
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(this.title,
+                          style: TextStyle(fontSize: 14, color: Colors.black))),
+                  this.choose
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Text('¥$price',
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.red[300])),
+                            FlatButton(
+                              color: Colors.red[300],
+                              textColor: Colors.white,
+                              shape: StadiumBorder(),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 10),
+                              onPressed: this.chooseHandler,
+                              child:
+                                  Text('选规格', style: TextStyle(fontSize: 11)),
+                            )
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(this.name,
+                                    style: TextStyle(
+                                        fontSize: 11, color: Colors.grey)),
+                                Text('¥$price',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.red[300]))
+                              ],
+                            ),
+                            this.renderAdd
+                          ],
+                        )
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

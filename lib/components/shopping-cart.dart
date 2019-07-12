@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:badges/badges.dart';
 
 class ShoppingCart extends StatefulWidget {
+  static const double HEIGHT = 50.0;
+
   @override
   State<StatefulWidget> createState() {
     return _ShoppingCartState();
@@ -95,7 +97,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
       onPressed: this.store.total > 0 ? () {} : null,
       color: Color(0xFFCD2626),
       disabledColor: Colors.grey,
-      height: 50,
+      height: ShoppingCart.HEIGHT,
       minWidth: 70,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.horizontal(right: Radius.circular(30))),
@@ -113,7 +115,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
       child: ClipRRect(
         borderRadius: BorderRadius.all(Radius.circular(30)),
         child: Container(
-          height: 50,
+          height: ShoppingCart.HEIGHT,
           color: Color(0xFF2B2B2B),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

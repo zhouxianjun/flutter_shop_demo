@@ -6,29 +6,64 @@ import '../config.dart';
 
 part 'cart-goods.g.dart';
 
-class CartGoods = _CartGoods with _$CartGoods;
+class CartGoods extends _CartGoods {
+  final ShoppingCartStore shoppingCart;
+  CartGoods(this.shoppingCart) : super(shoppingCart);
 
-abstract class _CartGoods with Store {
+  CartGoods.fromJSON(this.shoppingCart, Map map) : super(shoppingCart) {
+    Map unit;
+    if (map.containsKey('units')) {
+      unit = map['units'][0];
+      this.parseUnits(map);
+    } else {
+      unit = map;
+    }
+    title = map['name'];
+    name = unit['name'];
+    price = int.parse('${unit['price']}');
+    picture = unit['picture'];
+    id = int.parse('${unit['id']}');
+    CartGoods tmp = shoppingCart.data
+        .singleWhere((item) => item.id == id, orElse: () => null);
+    quantity = tmp?.quantity ?? 0;
+    goodsId = int.parse(unit['goodsId'].toString());
+    canSaleQty = int.parse(unit['canSaleQty'].toString());
+    categoryId = int.parse(unit['categoryId'].toString());
+    imgs = map['imgs'];
+    choose = units.isEmpty ? map['choose'] ?? false : units.length > 1;
+    detail = map['detail'] ?? '<div/>';
+  }
+
+  factory CartGoods.getOrCreate(ShoppingCartStore shoppingCart, Map map) {
+    CartGoods tmp = CartGoods.fromJSON(shoppingCart, map);
+    CartGoods goods = shoppingCart.data.singleWhere((item) => item.id == tmp.id, orElse: () => tmp).update(tmp);
+    return goods;
+  }
+}
+
+class _CartGoods = __CartGoods with _$_CartGoods;
+
+abstract class __CartGoods with Store {
   final ShoppingCartStore shoppingCart;
   /**
    * 商品名称
    */
+  @observable
   String title;
-  /**
-   * 是否需要选择规格（多个规格）
-   */
-  bool choose;
   /**
    * 规格名称
    */
+  @observable
   String name;
   /**
    * 规格价格（分）
    */
+  @observable
   int price;
   /**
    * 规格图片
    */
+  @observable
   String picture;
   /**
    * 规格ID
@@ -46,57 +81,31 @@ abstract class _CartGoods with Store {
   /**
    * 可售数量
    */
+  @observable
   int canSaleQty;
   /**
    * 类别ID
    */
+  @observable
   int categoryId;
   /**
    * 图片逗号分隔
    */
+  @observable
   String imgs;
-  List units;
+  /**
+   * 详情富文本
+   */
+  @observable
+  String detail;
 
-  _CartGoods(this.shoppingCart,
-      {this.title,
-      this.choose,
-      this.name,
-      this.price,
-      this.picture,
-      this.id,
-      this.quantity,
-      this.goodsId,
-      this.canSaleQty,
-      this.categoryId,
-      this.units});
+  @observable
+  bool choose;
 
-  _CartGoods.fromJSON(this.shoppingCart, Map map) {
-    Map unit;
-    if (map.containsKey('units')) {
-      this.parseUnits(map);
-      unit = this.units[0];
-    } else {
-      unit = map;
-      units = [];
-    }
-    title = map['name'];
-    choose = units.length > 1;
-    name = unit['name'];
-    price = unit['price'];
-    picture = unit['picture'];
-    id = unit['id'];
-    CartGoods tmp = shoppingCart.data
-        .singleWhere((item) => item.id == id, orElse: () => null);
-    quantity = tmp?.quantity ?? 0;
-    goodsId = unit['goodsId'];
-    canSaleQty = unit['canSaleQty'];
-    categoryId = unit['categoryId'];
-    imgs = map['imgs'];
-  }
+  @observable
+  ObservableList<CartGoods> units = ObservableList<CartGoods>();
 
-  bool get isChoose {
-    return this.units.length > 1;
-  }
+  __CartGoods(this.shoppingCart);
 
   String get pictureUrl {
     return '${Config.IMG_ADDRESS}$picture';
@@ -111,7 +120,7 @@ abstract class _CartGoods with Store {
     if (this.imgs != null) {
       images.addAll(this.imgs.split(','));
     }
-    images.addAll(this.units.map((unit) => unit['picture']));
+    images.addAll(this.units.map((unit) => unit.picture));
     return images.where((img) => img != null && img.trim().isNotEmpty).map((img) => '${Config.IMG_ADDRESS}$img').toSet();
   }
 
@@ -121,7 +130,6 @@ abstract class _CartGoods with Store {
    */
   @computed
   int get max {
-    print('$goodsId -- $have');
     return this.quantity + this.canSaleQty - this.have;
   }
 
@@ -142,18 +150,41 @@ abstract class _CartGoods with Store {
     this.quantity = quantity;
   }
 
+  @action
+  CartGoods update(CartGoods newer) {
+    if (this == newer) {
+      return this;
+    }
+    this.name = newer.name;
+    this.picture = newer.picture;
+    this.price = newer.price;
+    this.title = newer.title;
+    this.canSaleQty = newer.canSaleQty;
+    this.categoryId = newer.categoryId;
+    this.detail = newer.detail;
+    this.imgs = newer.imgs;
+    if (newer.units == null || newer.units.isEmpty) {
+      this.units.clear();
+    } else if (this.units == null || this.units.isEmpty) {
+      this.units = newer.units;
+    } else {
+      this.units.clear();
+      this.units.addAll(newer.units.map((item) => this.units.singleWhere((u) => u.id == item.id, orElse: () => item).update(item)));
+    }
+    return this;
+  }
+
   void parseUnits(Map map) {
-    List units = (map['units'] as List).map((v) {
-      v = v as Map;
-      v['quantity'] = 0;
-      v['id'] = num.parse(v['id']);
-      v['price'] = num.parse(v['price']);
+    List list = map['units'] as List;
+    List<CartGoods> units = list.map((v) {
       v['goodsId'] = map['id'];
       v['canSaleQty'] = map['canSaleQty'];
       v['categoryId'] = map['categoryId'];
-      return v;
+      v['choose'] = list.length > 1;
+      return CartGoods.getOrCreate(shoppingCart, v);
     }).toList();
-    units.sort((a, b) => a['price'] - b['price']);
-    this.units = units;
+    units.sort((a, b) => a.price - b.price);
+    this.units.clear();
+    this.units.addAll(units);
   }
 }

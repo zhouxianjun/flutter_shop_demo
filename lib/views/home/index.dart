@@ -109,6 +109,7 @@ class _HomeState extends State<Home> {
                         .map((item) => _renderCategoryItem(item))).toList(),
               ),
             ),
+            Container(width: 8, color: Color(0xFFF5F5F5),),
             Expanded(
               flex: 2,
               child: GoodsList(this.selected),

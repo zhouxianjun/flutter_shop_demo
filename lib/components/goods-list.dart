@@ -71,7 +71,7 @@ class _GoodsListState extends State<GoodsList> {
     if (res.data != null && res.data['success']) {
       final List data = res.data['value']['list'] ?? [];
       collectionForVo(data, 'unit');
-      final List<CartGoods> goodsList = data.map((item) => CartGoods.fromJSON(shoppingCart, item)).toList();
+      final List<CartGoods> goodsList = data.map((item) => CartGoods.getOrCreate(shoppingCart, item)).toList();
       setState(() {
         this.pageNum++;
         this.list.addAll(goodsList);

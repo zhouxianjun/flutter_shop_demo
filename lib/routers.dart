@@ -16,7 +16,7 @@ class Routers {
   static const String MINE = '/member';
   static const String C1 = '/c1';
   static const String C2 = '/c2';
-  static const String DETAIL = '/detail/:id';
+  static const String DETAIL = '/detail';
 
   static void configureRoutes(Router router) {
     router.define(LOGIN, handler: Handler(handlerFunc: (context, params) => Login()));
@@ -24,7 +24,7 @@ class Routers {
     router.define(MINE, handler: Handler(handlerFunc: (context, params) => Mine()));
     router.define(C1, handler: Handler(handlerFunc: (context, params) => Counter1()));
     router.define(C2, handler: Handler(handlerFunc: (context, params) => Counter2()));
-    router.define(DETAIL, handler: Handler(handlerFunc: (context, params) => GoodsDetail(int.parse(params['id'][0]))));
+    router.define(DETAIL, handler: Handler(handlerFunc: (context, params) => GoodsDetail()));
     Routers.router = router;
   }
 

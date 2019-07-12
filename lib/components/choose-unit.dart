@@ -30,11 +30,11 @@ class _ChooseUnitState extends State<ChooseUnit> {
         (item) =>
             item.goodsId == this.widget.goods.goodsId && item.quantity > 0,
         orElse: () {
-      return CartGoods.fromJSON(shoppingCart, this.widget.goods.units[0]);
+      return this.widget.goods.units[0];
     });
   }
 
-  List get units {
+  List<CartGoods> get units {
     return this.widget.goods.units;
   }
 
@@ -90,13 +90,13 @@ class _ChooseUnitState extends State<ChooseUnit> {
         .map((map) => Padding(
               padding: EdgeInsets.symmetric(horizontal: 4),
               child: ChoiceChip(
-                label: Text(map['name']),
-                selected: this.unit.id == map['id'],
+                label: Text(map.name),
+                selected: this.unit.id == map.id,
                 onSelected: (val) {
                   setState(() {
                     this.unit = this.shoppingCart.data.singleWhere(
-                        (item) => item.id == map['id'],
-                        orElse: () => CartGoods.fromJSON(shoppingCart, map));
+                        (item) => item.id == map.id,
+                        orElse: () => map);
                   });
                 },
               ),
