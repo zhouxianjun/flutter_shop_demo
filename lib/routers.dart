@@ -21,10 +21,11 @@ class Routers {
   static void configureRoutes(Router router) {
     router.define(LOGIN, handler: Handler(handlerFunc: (context, params) => Login()));
     router.define(HOME, handler: Handler(handlerFunc: (context, params) => Home()));
-    router.define(MINE, handler: Handler(handlerFunc: (context, params) => Mine()));
+    router.define(MINE, handler: Handler(handlerFunc: (context, params) => Mine()), transitionType: TransitionType.native);
     router.define(C1, handler: Handler(handlerFunc: (context, params) => Counter1()));
     router.define(C2, handler: Handler(handlerFunc: (context, params) => Counter2()));
-    router.define(DETAIL, handler: Handler(handlerFunc: (context, params) => GoodsDetail()));
+    router.define(DETAIL, handler: Handler(handlerFunc: (context, params) => GoodsDetail()), transitionType: TransitionType.native);
+    router.printTree();
     Routers.router = router;
   }
 

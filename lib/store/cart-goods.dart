@@ -183,8 +183,8 @@ abstract class __CartGoods with Store {
       v['choose'] = list.length > 1;
       return CartGoods.getOrCreate(shoppingCart, v);
     }).toList();
-    units.sort((a, b) => a.price - b.price);
     this.units.clear();
     this.units.addAll(units);
+    this.units.sort((a, b) => a.price - b.price);
   }
 }
