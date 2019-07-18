@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_shop_demo/components/goods-item.dart';
 import 'package:flutter_shop_demo/components/shopping-cart.dart';
@@ -29,7 +30,9 @@ class _GoodsDetailState extends State<GoodsDetail>
   ScrollController _scrollController;
   TabController _tabController;
   double y;
+  double _detailOffset;
   CartGoods cartGoods;
+  GlobalKey _detailKey = GlobalKey();
 
   @override
   void initState() {
@@ -37,9 +40,12 @@ class _GoodsDetailState extends State<GoodsDetail>
     _scrollController = ScrollController(initialScrollOffset: 0);
     _tabController = TabController(vsync: this, length: 2);
     y = 0.0;
+    _detailOffset = 0.0;
     _scrollController.addListener(() {
+      final _y = _scrollController.offset;
+      _tabController.animateTo(_y < _detailOffset ? 0 : 1);
       setState(() {
-        y = _scrollController.offset;
+        y = _y;
       });
     });
   }
@@ -117,6 +123,12 @@ class _GoodsDetailState extends State<GoodsDetail>
           child: SizedBox(
             width: 120,
             child: TabBar(
+              onTap: (int index) {
+                _scrollController.animateTo(
+                    index == 0 ? 0.0 : this._detailOffset,
+                    duration: Duration(seconds: 1),
+                    curve: Curves.ease);
+              },
               labelPadding: EdgeInsets.zero,
               labelColor: Color(0xFFFF6347),
               indicatorColor: Color(0xFFFF6347),
@@ -197,6 +209,7 @@ class _GoodsDetailState extends State<GoodsDetail>
   Widget _renderDetail() {
     return SliverToBoxAdapter(
       child: Html(
+        key: _detailKey,
         padding: EdgeInsets.only(top: 15, bottom: ShoppingCart.HEIGHT),
         data: this.detail,
       ),
@@ -221,6 +234,16 @@ class _GoodsDetailState extends State<GoodsDetail>
     );
   }
 
+  double getDetailOffsetY() {
+    if (_detailKey.currentContext == null) {
+      return 0.0;
+    }
+    RenderBox box = _detailKey.currentContext.findRenderObject();
+    RenderAbstractViewport viewport = RenderAbstractViewport.of(box);
+    RevealedOffset offset = viewport.getOffsetToReveal(box, 0.0);
+    return offset.offset + 15;
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -230,6 +253,7 @@ class _GoodsDetailState extends State<GoodsDetail>
 
   @override
   Widget build(BuildContext context) {
+    this._detailOffset = this.getDetailOffsetY();
     return Scaffold(
       body: _body(),
       floatingActionButton: ShoppingCart(),
