@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_shop_demo/components/shopping-cart.dart';
 import 'package:flutter_shop_demo/constant.dart';
@@ -76,6 +77,31 @@ class _HomeState extends State<Home> {
     );
   }
 
+  Widget _renderContent() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          flex: 1,
+          child: ListView(
+            children: ListTile.divideTiles(
+                context: context,
+                tiles: this
+                    .categorys
+                    .map((item) => _renderCategoryItem(item))).toList(),
+          ),
+        ),
+        Container(
+          width: 8,
+          color: Color(0xFFF5F5F5),
+        ),
+        Expanded(
+          flex: 2,
+          child: GoodsList(this.selected),
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -97,25 +123,7 @@ class _HomeState extends State<Home> {
         onTap: () {
           FocusScope.of(context).requestFocus(FocusNode());
         },
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              flex: 1,
-              child: ListView(
-                children: ListTile.divideTiles(
-                    context: context,
-                    tiles: this
-                        .categorys
-                        .map((item) => _renderCategoryItem(item))).toList(),
-              ),
-            ),
-            Container(width: 8, color: Color(0xFFF5F5F5),),
-            Expanded(
-              flex: 2,
-              child: GoodsList(this.selected),
-            )
-          ],
-        ),
+        child: this._renderContent(),
       ),
     );
   }

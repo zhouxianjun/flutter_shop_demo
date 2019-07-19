@@ -1,3 +1,4 @@
+import 'package:event_bus/event_bus.dart';
 import 'package:flutter_shop_demo/store/mine/mine.dart';
 import 'package:flutter_shop_demo/store/shopping-cart.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ get providers {
     _providers = [
       Provider<MineStore>(builder: (_) => mineStore),
       Provider<ShoppingCartStore>(builder: (_) => shoppingCartStore),
+      Provider<EventBus>(builder: (_) => EventBus())
     ];
   }
   return _providers;

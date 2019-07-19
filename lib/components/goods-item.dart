@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_shop_demo/components/choose-unit.dart';
@@ -106,73 +107,77 @@ class _GoodsItemState extends State<GoodsItem> {
     );
   }
 
+  Widget _renderItem() {
+    return InkWell(
+      onTap: () => Navigator.pushNamed(context, Routers.DETAIL,
+          arguments: this.cartGoods),
+      child: Row(
+        children: <Widget>[
+          CachedNetworkImage(
+            imageUrl: this.picture,
+            width: 60,
+            height: 60,
+            fit: BoxFit.contain,
+            placeholder: (_, url) => CircularProgressIndicator(),
+          ),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(this.title,
+                        style: TextStyle(fontSize: 14, color: Colors.black))),
+                this.choose
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Text('¥$price',
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.red[300])),
+                          FlatButton(
+                            color: Colors.red[300],
+                            textColor: Colors.white,
+                            shape: StadiumBorder(),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 10),
+                            onPressed: this.chooseHandler,
+                            child: Text('选规格', style: TextStyle(fontSize: 11)),
+                          )
+                        ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(this.name,
+                                  style: TextStyle(
+                                      fontSize: 11, color: Colors.grey)),
+                              Text('¥$price',
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.red[300]))
+                            ],
+                          ),
+                          this.renderAdd
+                        ],
+                      )
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4, horizontal: 6),
-      child: InkWell(
-        onTap: () => Navigator.pushNamed(context, Routers.DETAIL, arguments: this.cartGoods),
-        child: Row(
-          children: <Widget>[
-            CachedNetworkImage(
-              imageUrl: this.picture,
-              width: 60,
-              height: 60,
-              fit: BoxFit.contain,
-              placeholder: (_, url) => CircularProgressIndicator(),
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(this.title,
-                          style: TextStyle(fontSize: 14, color: Colors.black))),
-                  this.choose
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            Text('¥$price',
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.red[300])),
-                            FlatButton(
-                              color: Colors.red[300],
-                              textColor: Colors.white,
-                              shape: StadiumBorder(),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 10),
-                              onPressed: this.chooseHandler,
-                              child:
-                                  Text('选规格', style: TextStyle(fontSize: 11)),
-                            )
-                          ],
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(this.name,
-                                    style: TextStyle(
-                                        fontSize: 11, color: Colors.grey)),
-                                Text('¥$price',
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.red[300]))
-                              ],
-                            ),
-                            this.renderAdd
-                          ],
-                        )
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
+      child: this._renderItem(),
     );
   }
 }

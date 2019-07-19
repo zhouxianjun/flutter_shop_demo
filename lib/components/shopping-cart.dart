@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_shop_demo/store/shopping-cart.dart';
 import 'package:flutter_shop_demo/utils/common.dart';
@@ -8,13 +9,15 @@ import 'package:badges/badges.dart';
 class ShoppingCart extends StatefulWidget {
   static const double HEIGHT = 50.0;
 
+  ShoppingCart({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
-    return _ShoppingCartState();
+    return ShoppingCartState();
   }
 }
 
-class _ShoppingCartState extends State<ShoppingCart> {
+class ShoppingCartState extends State<ShoppingCart> {
   ShoppingCartStore store;
 
   @override
@@ -63,6 +66,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
     return have
         ? Badge(
             badgeContent: Text(this.store.total.toString()),
+            toAnimate: false,
             child: icon,
           )
         : icon;
